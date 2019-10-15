@@ -7,6 +7,7 @@ const (
 	HEALTH    	= "/api/health"
 	LDAP_PING 	= "/api/ldap/ping"
 	USERS		= "/api/users"
+	VOLUME		= "/api/systeminfo/volumes"
 
 )
 

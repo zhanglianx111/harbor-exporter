@@ -54,18 +54,21 @@ func filterCookie(cookies []*http.Cookie) (c string) {
 }
 
 func get(url string) []byte {
+	fmt.Printf("url:%s\n", url)
 	httpClient := http.Client{}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil
 	}
 	req.Header.Add("accept", "application/json")
+	req.Header.Add("authorization", "Basic YWRtaW46SGFyYm9yMTIzNDU=")
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("http code: %d\n", resp.StatusCode)
 		return nil
 	}
 
@@ -73,6 +76,6 @@ func get(url string) []byte {
 	if err != nil {
 		return nil
 	}
-
+	//fmt.Printf("body:%v\n", body)
 	return body
 }

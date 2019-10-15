@@ -49,7 +49,7 @@ func GetHealthStatus() map[string]int8 {
 		fmt.Println(err.Error())
 		return status
 	}
-	fmt.Printf("%v\n", healths.Components)
+	//fmt.Printf("%v\n", healths.Components)
 	// harbor status
 	if healths.Status == "healthy" {
 		status[Harbor] = 1

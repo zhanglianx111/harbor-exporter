@@ -46,6 +46,7 @@ func newGlobalMetric(namespace , metricName , docString string, labels []string)
 func NewMetrics(namespace string) *Metrics {
 	return &Metrics{
 		metrics: map[string]*prometheus.Desc{
+			// gauge
 			"harbor_gauge_metric": newGlobalMetric(namespace, "status",  "Current the status of harbor", []string{"component"}),
 			"registry_gauge_metric": newGlobalMetric(namespace, "registry_status",  "Current the status of registry in harbor", []string{"component"}),
 			"redis_gauge_metric": newGlobalMetric(namespace, "redis_status",  "Current the status of redis in harbor", []string{"component"}),
@@ -54,6 +55,9 @@ func NewMetrics(namespace string) *Metrics {
 			"jobservice_gauge_metric": newGlobalMetric(namespace, "jobservice_status","Current the status of jobservice in harbor", []string{"component"}),
 			"database_gauge_metric": newGlobalMetric(namespace, "database_status","Current the status of database in harbor", []string{"component"}),
 			"registryctl_gauge_metric": newGlobalMetric(namespace, "registryctl_status","Current the status of registryctl in harbor", []string{"component"}),
+
+			// conter
+			"volume": newGlobalMetric(namespace, "volume", "Current the size of volume", []string{"size"}),
 		},
 	}
 }
@@ -83,10 +87,18 @@ func (c *Metrics) Collect(ch chan<- prometheus.Metric) {
 		ch <-prometheus.MustNewConstMetric(c.metrics["my_counter_metric"], prometheus.CounterValue, float64(currentValue), host)
 	}
 
+
 	for host, currentValue := range mockGaugeMetricData {
 		ch <-prometheus.MustNewConstMetric(c.metrics["harbor_gauge_metric"], prometheus.GaugeValue, float64(currentValue), host)
 	}
 	*/
+
+
+	volumeConterMetricsData := c.GetVolumeInfo()
+	for name, value := range volumeConterMetricsData {
+		ch <-prometheus.MustNewConstMetric(c.metrics["volume"], prometheus.CounterValue, float64(value), name)
+	}
+
 	harborGaugeMetricsData := c.GetHarborStatus()
 		for comp, currentValue := range harborGaugeMetricsData {
 			switch comp {
@@ -141,6 +153,15 @@ func (c *Metrics) GetHarborStatus() (harborGaugeMetricsData map[string]int8) {
 	return
 }
 
+func (c *Metrics) GetVolumeInfo() (volumeCounterMetricsData map[string]uint64) {
+	volume := harbor.GetVolumeInfo()
+	volumeCounterMetricsData = map[string]uint64{}
+	for name, value := range volume {
+		fmt.Printf("%s: %d\n", name, value)
+		volumeCounterMetricsData[name] = value
+	}
+	return
+}
 
 
 
