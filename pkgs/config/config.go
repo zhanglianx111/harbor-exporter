@@ -14,7 +14,7 @@ type Conf struct {
 
 func GetConfig() *Conf {
 	c := new(Conf)
-	yamlFile, err := ioutil.ReadFile("/Users/zhanglx/go/src/github.com/zhanglianx111/harbor-exporter/config/config.yaml")
+	yamlFile, err := ioutil.ReadFile("/etc/harbor-exporter/config.yaml")
 	if err != nil {
 		fmt.Printf("read harbor config error: %v\n", err.Error())
 		return nil

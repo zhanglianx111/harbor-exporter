@@ -16,7 +16,7 @@ func login() {
 		return
 	}
 	user, passwd := cfg.Username, cfg.Password
-	loginUrl := "http://" + cfg.Harbor + LOGIN
+	loginUrl := cfg.Harbor + LOGIN
 	fmt.Printf("login ->url:%s username: %s, password: %s\n", loginUrl, user, passwd)
 	cookie := postLogin(loginUrl, cfg.Username, cfg.Password)
 	fmt.Printf("login cookio: %v\n", cookie)

@@ -41,12 +41,12 @@ func GetHealthStatus() map[string]int8 {
 	}
 
 	healths := &Health{}
-	healthUrl := "http://" + cfg.Harbor + HEALTH
+	healthUrl := cfg.Harbor + HEALTH
 	bodyByte := get(healthUrl)
 
 	err := json.Unmarshal(bodyByte, healths)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Printf("json unmarshal error: %v\n",err.Error())
 		return status
 	}
 	//fmt.Printf("%v\n", healths.Components)

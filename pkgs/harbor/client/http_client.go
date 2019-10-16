@@ -61,7 +61,7 @@ func get(url string) []byte {
 		return nil
 	}
 	req.Header.Add("accept", "application/json")
-	req.Header.Add("authorization", "Basic YWRtaW46SGFyYm9yMTIzNDU=")
+	req.Header.Add("authorization", "Basic bHh6aGFuZzplRkl0bmIhMQ==")
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil
@@ -76,6 +76,6 @@ func get(url string) []byte {
 	if err != nil {
 		return nil
 	}
-	//fmt.Printf("body:%v\n", body)
+	fmt.Printf("body:%v\n", body)
 	return body
 }

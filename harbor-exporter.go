@@ -5,14 +5,21 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/zhanglianx111/harbor-exporter/pkgs/collector"
-	"log"
 	"net/http"
+	"github.com/sirupsen/logrus"
+	"os"
 )
 
 var (
-	listenAddr       = flag.String("listen-port", "9001", "An port for getting metrics")
+	listenAddr       = flag.String("listen-port", "0.0.0.0:9001", "An port for getting metrics")
 	metricsPath      = flag.String("metrics-path", "/metrics", "expose metrics url path")
 	metricsNamespace = flag.String("metrics-namespace", "harbor", "Prometheus metrics namespace, as the prefix of metrics name")
+	harborUsername	 = flag.String("username", "admin", "the supersuser in harbor")
+	harborPassword	 = flag.String("password", "Harbor12345", "the password for superuser in harbor")
+	harborAddr		 = flag.String("harbor-address", "exporter.harbor.com", "harbor address")
+
+	log 			 = logrus.New()
+
 )
 
 func main() {
@@ -20,6 +27,8 @@ func main() {
 		http.Handle("/metrics", promhttp.Handler())
 		log.Fatal(http.ListenAndServe(":8080", nil))
 	*/
+
+	log.Out = os.Stdout
 
 	flag.Parse()
 
@@ -29,6 +38,6 @@ func main() {
 
 	http.Handle(*metricsPath, promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 
-	log.Printf("Starting Server at http://localhost:%s%s", *listenAddr, *metricsPath)
-	log.Fatal(http.ListenAndServe(":"+*listenAddr, nil))
+	log.Infof("Starting Server at http://%s%s", *listenAddr, *metricsPath)
+	log.Fatal(http.ListenAndServe(*listenAddr, nil))
 }

@@ -32,7 +32,7 @@ func GetVolumeInfo() map[string]uint64 {
 	}
 
 	volume := SystemInfo{Storage{}}
-	volumeUrl := "http://" + cfg.Harbor + VOLUME
+	volumeUrl := cfg.Harbor + VOLUME
 	bodyByte := get(volumeUrl)
 	//fmt.Printf("volume from harbor: %v\n", string(bodyByte))
 	err := json.Unmarshal(bodyByte, &volume)
