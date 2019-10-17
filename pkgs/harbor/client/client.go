@@ -1,6 +1,10 @@
 package harbor
 
-import "github.com/zhanglianx111/harbor-exporter/pkgs/config"
+import (
+	"encoding/base64"
+	"github.com/zhanglianx111/harbor-exporter/pkgs/config"
+	"os"
+)
 
 const (
 	LOGIN     	= "/c/login"
@@ -12,11 +16,20 @@ const (
 
 )
 
-var Config *config.Conf
-
 func init() { // read user、passwd and url of harbor
+	/*
 	Config = config.GetConfig()
 	if Config == nil {
 		return
 	}
+	*/
+	// baisc auth
+
+	tok := config.Config.Username+":"+config.Config.Password
+	hashStr := base64.StdEncoding.EncodeToString([]byte(tok))
+	if len(hashStr) != 0 {
+		os.Setenv("baseAuth", hashStr)
+	}
 }
+
+

@@ -34,14 +34,15 @@ type Health struct {
 */
 func GetHealthStatus() map[string]int8 {
 	status := map[string]int8{}
-
+	/*
 	cfg := config.GetConfig()
 	if cfg.Harbor == "" {
 		return status
 	}
+	*/
 
 	healths := &Health{}
-	healthUrl := cfg.Harbor + HEALTH
+	healthUrl := config.Config.Harbor + HEALTH
 	bodyByte := get(healthUrl)
 	if len(bodyByte) == 0 {
 		log.Warn("get response body is nil")

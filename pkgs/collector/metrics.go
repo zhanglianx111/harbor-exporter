@@ -3,6 +3,7 @@ package collector
 import (
 	"github.com/istio/pkg/log"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/zhanglianx111/harbor-exporter/pkgs/config"
 	"github.com/zhanglianx111/harbor-exporter/pkgs/harbor/client"
 	"math/rand"
 	"sync"
@@ -47,14 +48,14 @@ func NewMetrics(namespace string) *Metrics {
 	return &Metrics{
 		metrics: map[string]*prometheus.Desc{
 			// gauge
-			"harbor_gauge_metric": newGlobalMetric(namespace, "status",  "Current the status of harbor", []string{"component"}),
-			"registry_gauge_metric": newGlobalMetric(namespace, "registry_status",  "Current the status of registry in harbor", []string{"component"}),
-			"redis_gauge_metric": newGlobalMetric(namespace, "redis_status",  "Current the status of redis in harbor", []string{"component"}),
-			"core_gauge_metric": newGlobalMetric(namespace, "core_status","Current the status of core in harbor", []string{"component"}),
-			"portal_gauge_metric": newGlobalMetric(namespace, "portal_status","Current the status of portal in harbor", []string{"component"}),
-			"jobservice_gauge_metric": newGlobalMetric(namespace, "jobservice_status","Current the status of jobservice in harbor", []string{"component"}),
-			"database_gauge_metric": newGlobalMetric(namespace, "database_status","Current the status of database in harbor", []string{"component"}),
-			"registryctl_gauge_metric": newGlobalMetric(namespace, "registryctl_status","Current the status of registryctl in harbor", []string{"component"}),
+			"harbor_gauge_metric": newGlobalMetric(namespace, "status",  "Current the status of harbor", []string{"component","host"}),
+			"registry_gauge_metric": newGlobalMetric(namespace, "registry_status",  "Current the status of registry in harbor", []string{"component", "host"}),
+			"redis_gauge_metric": newGlobalMetric(namespace, "redis_status",  "Current the status of redis in harbor", []string{"component", "host"}),
+			"core_gauge_metric": newGlobalMetric(namespace, "core_status","Current the status of core in harbor", []string{"component", "host"}),
+			"portal_gauge_metric": newGlobalMetric(namespace, "portal_status","Current the status of portal in harbor", []string{"component", "host"}),
+			"jobservice_gauge_metric": newGlobalMetric(namespace, "jobservice_status","Current the status of jobservice in harbor", []string{"component", "host"}),
+			"database_gauge_metric": newGlobalMetric(namespace, "database_status","Current the status of database in harbor", []string{"component", "host"}),
+			"registryctl_gauge_metric": newGlobalMetric(namespace, "registryctl_status","Current the status of registryctl in harbor", []string{"component", "host"}),
 
 			// conter
 			"volume": newGlobalMetric(namespace, "volume", "Current the size of volume", []string{"size"}),
@@ -103,19 +104,19 @@ func (c *Metrics) Collect(ch chan<- prometheus.Metric) {
 		for comp, currentValue := range harborGaugeMetricsData {
 			switch comp {
 			case "harbor":
-				ch <-prometheus.MustNewConstMetric(c.metrics["harbor_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp)
+				ch <-prometheus.MustNewConstMetric(c.metrics["harbor_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp, config.Config.Harbor)
 			case "core":
-				ch <-prometheus.MustNewConstMetric(c.metrics["core_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp)
+				ch <-prometheus.MustNewConstMetric(c.metrics["core_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp, config.Config.Harbor)
 			case "registry":
-				ch <-prometheus.MustNewConstMetric(c.metrics["registry_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp)
+				ch <-prometheus.MustNewConstMetric(c.metrics["registry_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp, config.Config.Harbor)
 			case "registryctl":
-				ch <-prometheus.MustNewConstMetric(c.metrics["registryctl_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp)
+				ch <-prometheus.MustNewConstMetric(c.metrics["registryctl_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp, config.Config.Harbor)
 			case "database":
-				ch <-prometheus.MustNewConstMetric(c.metrics["database_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp)
+				ch <-prometheus.MustNewConstMetric(c.metrics["database_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp, config.Config.Harbor)
 			case "jobservice":
-				ch <-prometheus.MustNewConstMetric(c.metrics["jobservice_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp)
+				ch <-prometheus.MustNewConstMetric(c.metrics["jobservice_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp, config.Config.Harbor)
 			case "redis":
-				ch <-prometheus.MustNewConstMetric(c.metrics["redis_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp)
+				ch <-prometheus.MustNewConstMetric(c.metrics["redis_gauge_metric"], prometheus.GaugeValue, float64(currentValue), comp, config.Config.Harbor)
 			}
 		}
 

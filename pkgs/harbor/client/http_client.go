@@ -1,12 +1,16 @@
 package harbor
 
 import (
+	"crypto/tls"
+	"github.com/parnurzeal/gorequest"
 	log "github.com/sirupsen/logrus"
-
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 )
+
+var request = gorequest.New().TLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 
 func postLogin(url, user, passwd string) (cookie string) {
 	httpClient := http.Client{}
@@ -55,22 +59,30 @@ func filterCookie(cookies []*http.Cookie) (c string) {
 
 func get(url string) []byte {
 	log.Infof("url:%s\n", url)
+
 	httpClient := http.Client{}
+
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Errorf("request method:%s, url: %s\n", http.MethodGet, url)
 		return nil
 	}
 	req.Header.Add("accept", "application/json")
-	req.Header.Add("authorization", "Basic bHh6aGFuZzplRkl0bmIhMQ==")
+	baseAuth := "Basic " + os.Getenv("baseAuth")
+	req.Header.Add("authorization", baseAuth)
+
+	/* TODO 使用cookie */
+	//req.Header.Add("cookie", os.Getenv("cookie"))
+
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		log.Errorf("get respones for harbor err: %v\n", err.Error())
 		return nil
 	}
+
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		log.Errorf("http code: %d\n", resp.StatusCode)
+		log.Errorf("respone's code: %d\n", resp.StatusCode)
 		return nil
 	}
 
@@ -79,5 +91,6 @@ func get(url string) []byte {
 		log.Errorf("read respone body err: %v\n", err.Error())
 		return nil
 	}
+
 	return body
 }

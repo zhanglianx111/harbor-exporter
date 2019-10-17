@@ -25,14 +25,15 @@ type Storage struct {
 
 func GetVolumeInfo() map[string]uint64 {
 	volumeInfo := map[string]uint64{}
-
+	/*
 	cfg := config.GetConfig()
 	if cfg.Harbor == "" {
 		return volumeInfo
 	}
+	*/
 
 	volume := SystemInfo{Storage{}}
-	volumeUrl := cfg.Harbor + VOLUME
+	volumeUrl := config.Config.Harbor + VOLUME
 	bodyByte := get(volumeUrl)
 	if len(bodyByte) == 0 {
 		return volumeInfo
