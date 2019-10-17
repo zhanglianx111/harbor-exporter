@@ -1,7 +1,7 @@
 package harbor
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhanglianx111/harbor-exporter/pkgs/config"
 	"os"
 )
@@ -12,14 +12,12 @@ func login() {
 	// get config for harbor
 	cfg := config.GetConfig()
 	if cfg == nil {
-		fmt.Println("1")
 		return
 	}
 	user, passwd := cfg.Username, cfg.Password
 	loginUrl := cfg.Harbor + LOGIN
-	fmt.Printf("login ->url:%s username: %s, password: %s\n", loginUrl, user, passwd)
+	log.Infof("login ->url:%s username: %s, password: %s\n", loginUrl, user, passwd)
 	cookie := postLogin(loginUrl, cfg.Username, cfg.Password)
-	fmt.Printf("login cookio: %v\n", cookie)
 
 	if cookie != "" {
 		os.Setenv("cookie", cookie)

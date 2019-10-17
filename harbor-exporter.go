@@ -22,13 +22,13 @@ var (
 
 )
 
-func main() {
-	/*
-		http.Handle("/metrics", promhttp.Handler())
-		log.Fatal(http.ListenAndServe(":8080", nil))
-	*/
-
+func init() {
+	log.Level = logrus.DebugLevel
 	log.Out = os.Stdout
+}
+
+func main() {
+//	log.Out = os.Stdout
 
 	flag.Parse()
 

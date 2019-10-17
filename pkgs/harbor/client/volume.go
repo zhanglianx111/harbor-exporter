@@ -1,8 +1,8 @@
 package harbor
 
 import (
-	"fmt"
 	"encoding/json"
+	"github.com/prometheus/common/log"
 	"github.com/zhanglianx111/harbor-exporter/pkgs/config"
 )
 
@@ -34,10 +34,12 @@ func GetVolumeInfo() map[string]uint64 {
 	volume := SystemInfo{Storage{}}
 	volumeUrl := cfg.Harbor + VOLUME
 	bodyByte := get(volumeUrl)
-	//fmt.Printf("volume from harbor: %v\n", string(bodyByte))
+	if len(bodyByte) == 0 {
+		return volumeInfo
+	}
 	err := json.Unmarshal(bodyByte, &volume)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Errorf("json unmarshal error: %v\n",err.Error())
 		return volumeInfo
 	}
 

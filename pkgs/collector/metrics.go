@@ -1,7 +1,7 @@
 package collector
 
 import (
-	"fmt"
+	"github.com/istio/pkg/log"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/zhanglianx111/harbor-exporter/pkgs/harbor/client"
 	"math/rand"
@@ -144,10 +144,9 @@ func (c *Metrics) GenerateMockData() (mockCounterMetricData map[string]int, mock
 func (c *Metrics) GetHarborStatus() (harborGaugeMetricsData map[string]int8) {
 	//harborGaugeMetricsData = new(map[string]int8)
 	status := harbor.GetHealthStatus()
-	fmt.Println(status)
 	harborGaugeMetricsData = map[string]int8 {}
 	for comp, value := range status {
-		fmt.Printf("comp:%s, valule:%d\n", comp, value)
+		log.Debugf("comp:%s, valule:%d\n", comp, value)
 		harborGaugeMetricsData[comp] = value
 	}
 	return
@@ -157,7 +156,7 @@ func (c *Metrics) GetVolumeInfo() (volumeCounterMetricsData map[string]uint64) {
 	volume := harbor.GetVolumeInfo()
 	volumeCounterMetricsData = map[string]uint64{}
 	for name, value := range volume {
-		fmt.Printf("%s: %d\n", name, value)
+		log.Debugf("%s: %d\n", name, value)
 		volumeCounterMetricsData[name] = value
 	}
 	return

@@ -1,7 +1,8 @@
 package harbor
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
+
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -14,18 +15,17 @@ func postLogin(url, user, passwd string) (cookie string) {
 	b := strings.NewReader(body)
 	req, err := http.NewRequest(http.MethodPost, url, b)
 	if err != nil {
-		fmt.Printf("http new request error: %v\n", err.Error())
+		log.Errorf("http new request error: %v\n", err.Error())
 		return ""
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded;param=value")
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		fmt.Println("2")
 		return ""
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println("3")
+		log.Errorf("response code: %d\n", resp.StatusCode)
 		return ""
 	}
 
@@ -54,28 +54,30 @@ func filterCookie(cookies []*http.Cookie) (c string) {
 }
 
 func get(url string) []byte {
-	fmt.Printf("url:%s\n", url)
+	log.Infof("url:%s\n", url)
 	httpClient := http.Client{}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
+		log.Errorf("request method:%s, url: %s\n", http.MethodGet, url)
 		return nil
 	}
 	req.Header.Add("accept", "application/json")
 	req.Header.Add("authorization", "Basic bHh6aGFuZzplRkl0bmIhMQ==")
 	resp, err := httpClient.Do(req)
 	if err != nil {
+		log.Errorf("get respones for harbor err: %v\n", err.Error())
 		return nil
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		fmt.Printf("http code: %d\n", resp.StatusCode)
+		log.Errorf("http code: %d\n", resp.StatusCode)
 		return nil
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Errorf("read respone body err: %v\n", err.Error())
 		return nil
 	}
-	fmt.Printf("body:%v\n", body)
 	return body
 }

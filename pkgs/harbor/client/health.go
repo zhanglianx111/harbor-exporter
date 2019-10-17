@@ -2,7 +2,7 @@ package harbor
 
 import (
 	"encoding/json"
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhanglianx111/harbor-exporter/pkgs/config"
 )
 
@@ -43,13 +43,16 @@ func GetHealthStatus() map[string]int8 {
 	healths := &Health{}
 	healthUrl := cfg.Harbor + HEALTH
 	bodyByte := get(healthUrl)
-
-	err := json.Unmarshal(bodyByte, healths)
-	if err != nil {
-		fmt.Printf("json unmarshal error: %v\n",err.Error())
+	if len(bodyByte) == 0 {
+		log.Warn("get response body is nil")
 		return status
 	}
-	//fmt.Printf("%v\n", healths.Components)
+	err := json.Unmarshal(bodyByte, healths)
+	if err != nil {
+		log.Errorf("json unmarshal error: %v\n",err.Error())
+		return status
+	}
+
 	// harbor status
 	if healths.Status == "healthy" {
 		status[Harbor] = 1
