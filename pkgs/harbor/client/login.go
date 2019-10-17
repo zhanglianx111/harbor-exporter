@@ -18,8 +18,8 @@ func Login() {
 	*/
 	user, password := config.Config.Username, config.Config.Password
 	loginUrl := config.Config.Harbor + LOGIN
-	log.Infof("login ->url:%s username: %s passwd: %v\n", loginUrl, user, password)
-	cookie := postLogin(loginUrl, config.Config.Username, config.Config.Password)
+	log.Infof("login ->url:%s username: %s \n", loginUrl, user)
+	cookie := postLogin(loginUrl, user, password)
 	if cookie != "" {
 		log.Infof("get cookie is: %v\n", cookie)
 		os.Setenv("cookie", cookie)

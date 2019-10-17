@@ -1,16 +1,16 @@
 package harbor
 
 import (
-	"crypto/tls"
-	"github.com/parnurzeal/gorequest"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
+	"crypto/tls"
 )
 
-var request = gorequest.New().TLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+//var request = gorequest.New().TLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+
 
 func postLogin(url, user, passwd string) (cookie string) {
 	httpClient := http.Client{}
@@ -60,7 +60,10 @@ func filterCookie(cookies []*http.Cookie) (c string) {
 func get(url string) []byte {
 	log.Infof("url:%s\n", url)
 
-	httpClient := http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	httpClient := &http.Client{Transport:tr}
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
