@@ -5,34 +5,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/zhanglianx111/harbor-exporter/pkgs/config"
 	"github.com/zhanglianx111/harbor-exporter/pkgs/harbor/client"
-	"math/rand"
 	"sync"
 )
-/*
-var HarborStatus = prometheus.NewGauge(
-	prometheus.GaugeOpts{
-		Name: "harbor_status",
-		Help: "Current the status of harbor.",
-	}
-	)
-
-var RedisStatus = prometheus.NewGauge(
-	prometheus.GaugeOpts{
-		Name: "redis_status",
-		Help: "Current the status of redis in harbor",
-}
-
-	)
-
-/*
-hdFailures := prometheus.NewCounterVec(
-	prometheus.CounterOpts{
-		Name: "hd_errors_total",
-		Help: "Number of hard-disk errors.",
-	},
-	[]string{"device"},
-)
-*/
 
 type Metrics struct {
 	metrics map[string]*prometheus.Desc
@@ -56,9 +30,7 @@ func NewMetrics(namespace string) *Metrics {
 			"jobservice_gauge_metric": newGlobalMetric(namespace, "jobservice_status","Current the status of jobservice in harbor", []string{"component", "host"}),
 			"database_gauge_metric": newGlobalMetric(namespace, "database_status","Current the status of database in harbor", []string{"component", "host"}),
 			"registryctl_gauge_metric": newGlobalMetric(namespace, "registryctl_status","Current the status of registryctl in harbor", []string{"component", "host"}),
-
-			// conter
-			"volume": newGlobalMetric(namespace, "volume", "Current the size of volume", []string{"size"}),
+			"harbor_gauge_volume": newGlobalMetric(namespace, "volume", "Current the size of volume", []string{"size", "host"}),
 		},
 	}
 }
@@ -81,23 +53,17 @@ func (c *Metrics) Collect(ch chan<- prometheus.Metric) {
 	c.mutex.Lock()  // 加锁
 	defer c.mutex.Unlock()
 
-	//_, mockGaugeMetricData := c.GenerateMockData()
 	/* TODO 加入counter类型的metrics */
 	/*
 	for host, currentValue := range mockCounterMetricData {
 		ch <-prometheus.MustNewConstMetric(c.metrics["my_counter_metric"], prometheus.CounterValue, float64(currentValue), host)
 	}
-
-
-	for host, currentValue := range mockGaugeMetricData {
-		ch <-prometheus.MustNewConstMetric(c.metrics["harbor_gauge_metric"], prometheus.GaugeValue, float64(currentValue), host)
-	}
 	*/
 
 
-	volumeConterMetricsData := c.GetVolumeInfo()
-	for name, value := range volumeConterMetricsData {
-		ch <-prometheus.MustNewConstMetric(c.metrics["volume"], prometheus.CounterValue, float64(value), name)
+	volumeGaugeMetricsData := c.GetVolumeInfo()
+	for name, value := range volumeGaugeMetricsData {
+		ch <-prometheus.MustNewConstMetric(c.metrics["harbor_gauge_volume"], prometheus.GaugeValue, float64(value), name, config.Config.Harbor)
 	}
 
 	harborGaugeMetricsData := c.GetHarborStatus()
@@ -123,22 +89,6 @@ func (c *Metrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 
-/**
- * 函数：GenerateMockData
- * 功能：生成模拟数据
- */
-func (c *Metrics) GenerateMockData() (mockCounterMetricData map[string]int, mockGaugeMetricData map[string]int) {
-	mockCounterMetricData = map[string]int{
-		"yahoo.com": int(rand.Int31n(1000)),
-		"google.com": int(rand.Int31n(1000)),
-	}
-	mockGaugeMetricData = map[string]int{
-		"yahoo.com": int(rand.Int31n(10)),
-		"google.com": int(rand.Int31n(10)),
-	}
-	return
-}
-
 /*
 	harbor健康状态metrics
 */
@@ -153,12 +103,15 @@ func (c *Metrics) GetHarborStatus() (harborGaugeMetricsData map[string]int8) {
 	return
 }
 
-func (c *Metrics) GetVolumeInfo() (volumeCounterMetricsData map[string]uint64) {
+/*
+	harbor使用磁盘情况
+*/
+func (c *Metrics) GetVolumeInfo() (volumeGaugeMetricsData map[string]uint64) {
 	volume := harbor.GetVolumeInfo()
-	volumeCounterMetricsData = map[string]uint64{}
+	volumeGaugeMetricsData = map[string]uint64{}
 	for name, value := range volume {
 		log.Debugf("%s: %d\n", name, value)
-		volumeCounterMetricsData[name] = value
+		volumeGaugeMetricsData[name] = value
 	}
 	return
 }

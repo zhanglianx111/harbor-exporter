@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-if [ -f harbor-exporter ];then
-    rm -f harbor-exporter
-fi
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64  go build
-docker build -t harbor.aibee.cn/platform/harbor-exporter:dev .
-docker push harbor.aibee.cn/platform/harbor-exporter:dev
 
-rm harbor-exporter
+if [ $# -eq 0 ];then
+    echo "usage:
+    $0 tag
+    "
+    exit 0
+fi
+
+tag=$1
+
+docker build -t harbor.aibee.cn/platform/harbor-exporter:$tag --no-cache .
+docker push harbor.aibee.cn/platform/harbor-exporter:$tag

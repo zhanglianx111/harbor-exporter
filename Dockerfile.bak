@@ -1,8 +1,0 @@
-FROM alpine:latest
-
-
-COPY harbor-exporter /bin/harbor-exporter
-COPY config/config.yaml /etc/harbor-exporter/config.yaml
-RUN chmod +x /bin/harbor-exporter
-EXPOSE 9001
-ENTRYPOINT ["/bin/harbor-exporter"]
