@@ -25,9 +25,6 @@ spec:
       containers:
       - command:
         - /bin/harbor-exporter
-        - -username admin
-        - -password Harbor12345
-        - -harbor-address harbor.aibee.cn
         image: harbor.aibee.cn/platform/harbor-exporter:dev
         imagePullPolicy: Always
         name: harbor-exporter
@@ -41,6 +38,14 @@ spec:
         securityContext:
           privileged: false
           procMount: Default
+        volumeMounts:
+        - name: harbor
+          mountPath: "/etc/harbor"
+          readOnly: true
+      volumes:
+      - name: harbor
+        secret:
+          secretName: harbor
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30

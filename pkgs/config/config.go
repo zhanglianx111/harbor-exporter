@@ -1,8 +1,8 @@
 package config
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
 
@@ -15,44 +15,41 @@ type Conf struct {
 var Config *Conf
 
 func init() {
-	c := new(Conf)
-	Config = nil
-	yamlFile, err := ioutil.ReadFile("/etc/harbor-exporter/config.yaml")
+	getUserInfo()
+}
+
+func getUserInfo() {
+	Config = new(Conf)
+	//get username
+	user, err := ioutil.ReadFile("/etc/harbor/username")
 	if err != nil {
 		log.Errorf("read harbor config error: %v\n", err.Error())
 		return
 	}
 
-	err = yaml.Unmarshal(yamlFile, c)
-	if err != nil {
-		log.Errorf("unmarshal config file err: %v\n", err.Error())
-		return
-	}
-	Config = c
-}
-
-
-/*
-func GetConfig() *Conf {
-	c := new(Conf)
-	yamlFile, err := ioutil.ReadFile("/etc/harbor-exporter/config.yaml")
+	//get password
+	password, err := ioutil.ReadFile("/etc/harbor/password")
 	if err != nil {
 		log.Errorf("read harbor config error: %v\n", err.Error())
-		return nil
+		return
 	}
 
-	err = yaml.Unmarshal(yamlFile, c)
+	//get harbor address
+	harbor, err := ioutil.ReadFile("/etc/harbor/harbor")
 	if err != nil {
-		log.Errorf("unmarshal config file err: %v\n", err.Error())
-		return nil
+		log.Errorf("read harbor config error: %v\n", err.Error())
+		return
 	}
 
-	return c
-}
-*/
+	log.Debugf("username: %s, password: %s, harbor: %s\n", user, password, harbor)
 
-func GetHarborHost() string {
-	return Config.Harbor
+	if len(user) == 0 || len(password) == 0 || len(harbor) == 0 {
+		return
+	}
+
+	Config.Username = fmt.Sprintf("%s", user)
+	Config.Password = fmt.Sprintf("%s", password)
+	Config.Harbor = fmt.Sprintf("%s", harbor)
 }
 
 func GetUsername() string {
@@ -61,4 +58,8 @@ func GetUsername() string {
 
 func GetPassword() string {
 	return Config.Password
+}
+
+func GetHarborHost() string {
+	return Config.Harbor
 }
